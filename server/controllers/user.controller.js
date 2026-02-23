@@ -123,7 +123,7 @@ export const getUserSpeedTests = async (req, res) => {
     console.error("Get speed tests error:", error.message);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server error check your net",
     });
   }
 };
