@@ -1,4 +1,4 @@
-import SpeedTest from "../models/speedTest";
+import SpeedTest from "../models/speedTest.js";
 
 export const saveResult = async (req, res) => {
   try {

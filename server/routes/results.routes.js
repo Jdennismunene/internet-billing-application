@@ -1,9 +1,9 @@
 import express from "express";
-import resultsController from "../controllers/results.controller.js";
+import { saveResult, getResult } from "../controllers/results.controller.js";
 
 const router = express.Router();
 
-router.post("/", resultsController.saveResult);
-router.get("/:id", resultsController.getResult);
+router.post("/", saveResult);
+router.get("/:id", getResult);
 
 export default router;

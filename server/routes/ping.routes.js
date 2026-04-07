@@ -1,8 +1,8 @@
 import express from "express";
-import pingController from "../controllers/ping.controller.js";
+import { issueToken } from "../controllers/ping.controller.js";
 
 const router = express.Router();
 
-router.get("/token", pingController.issueToken);
+router.get("/token", issueToken);
 
 export default router;
