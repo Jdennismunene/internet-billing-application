@@ -13,6 +13,8 @@ import downloadRoutes from "./routes/download.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import resultsRoutes from "./routes/results.routes.js";
 import setupPingSocket from "./ws/pingSocket.js";
+import planRoutes from "./routes/plan.routes.js";
+import billingRoutes from "./routes/biling.routes.js";
 dotenv.config();
 await connectDB();
 
@@ -35,6 +37,8 @@ app.use("/api/ping", pingRoutes);
 app.use("/api/download", downloadRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/results", resultsRoutes);
+app.use("/api/plans", planRoutes);
+app.use("/api/billing", billingRoutes);
 
 // WebSocket
 setupPingSocket(server);
