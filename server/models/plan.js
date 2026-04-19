@@ -2,19 +2,29 @@ import mongoose from "mongoose";
 
 const planSchema = new mongoose.Schema(
   {
-    name: {
+    packageplan: {
+      type: String,
+      required: [true, "Plan plan is required"],
+      trim: true,
+    },
+    packagename: {
       type: String,
       required: [true, "Plan name is required"],
       trim: true,
       unique: true,
     },
-    speed: {
+    packageduration: {
+      type: String,
+      required: [true, "Plan name is required"],
+      trim: true,
+    },
+    packagespeed: {
       type: String,
       required: [true, "Speed is required"],
       trim: true,
     },
     price: {
-      type: Number,
+      type: String,
       required: [true, "Price is required"],
       min: [0, "Price cannot be negative"],
     },
@@ -29,7 +39,7 @@ const planSchema = new mongoose.Schema(
     duration: {
       type: Number,
       required: [true, "Duration is required"],
-      min: [1, "Duration must be at least 1 month"],
+      min: [1, "Duration must be at least 1 hour"],
       default: 1,
     },
     isActive: {

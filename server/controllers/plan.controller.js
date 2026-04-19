@@ -1,6 +1,6 @@
 import Plan from "../models/Plan.js";
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────
 
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
@@ -11,29 +11,38 @@ const sendResponse = (res, statusCode, success, message, data = null) => {
   return res.status(statusCode).json(payload);
 };
 
-// ─── Controllers ────────────────────────────────────────────────────────────
+// ─── CREATE PLAN ─────────────────────────────────────────
 
-/**
- * @desc    Create a new internet plan
- * @route   POST /api/plans
- * @access  Private (Admin)
- */
 export const createPlan = asyncHandler(async (req, res) => {
-  const { name, speed, price, dataLimit, description, duration } = req.body;
+  const {
+    packageplan,
+    packagename,
+    packageduration,
+    packagespeed,
+    price,
+    dataLimit,
+    description,
+    duration,
+  } = req.body;
 
-  const existingPlan = await Plan.findOne({ name: name?.trim() });
-  if (existingPlan) {
+  const existingName = await Plan.findOne({
+    packagename: packagename?.trim(),
+  });
+
+  if (existingName) {
     return sendResponse(
       res,
       409,
       false,
-      `A plan named "${name}" already exists`,
+      `A plan "${packagename}" already exists`,
     );
   }
 
   const plan = await Plan.create({
-    name,
-    speed,
+    packageplan,
+    packagename,
+    packageduration,
+    packagespeed,
     price,
     dataLimit,
     description,
@@ -43,16 +52,17 @@ export const createPlan = asyncHandler(async (req, res) => {
   return sendResponse(res, 201, true, "Plan created successfully", plan);
 });
 
-/**
- * @desc    Get all plans (optionally filter active only)
- * @route   GET /api/plans
- * @access  Public
- */
+// ─── GET ALL PLANS ───────────────────────────────────────
+
 export const getAllPlans = asyncHandler(async (req, res) => {
   const { active, minPrice, maxPrice, sort = "price" } = req.query;
 
   const filter = {};
-  if (active !== undefined) filter.isActive = active === "true";
+
+  if (active !== undefined) {
+    filter.isActive = active === "true";
+  }
+
   if (minPrice || maxPrice) {
     filter.price = {};
     if (minPrice) filter.price.$gte = Number(minPrice);
@@ -62,11 +72,12 @@ export const getAllPlans = asyncHandler(async (req, res) => {
   const allowedSorts = [
     "price",
     "-price",
-    "name",
-    "-name",
+    "packagename",
+    "-packagename",
     "createdAt",
     "-createdAt",
   ];
+
   const sortField = allowedSorts.includes(sort) ? sort : "price";
 
   const plans = await Plan.find(filter).sort(sortField).lean();
@@ -77,13 +88,14 @@ export const getAllPlans = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get a single plan by ID
- * @route   GET /api/plans/:id
- * @access  Public
- */
-export const getPlanById = asyncHandler(async (req, res) => {
-  const plan = await Plan.findById(req.params.id).lean();
+// ─── GET plan per package ─────────────────────────────────────
+
+export const getPlanByPackagePlan = asyncHandler(async (req, res) => {
+  const { packageplan } = req.params;
+
+  const plan = await Plan.find({
+    packageplan: packageplan?.trim(),
+  }).lean();
 
   if (!plan) {
     return sendResponse(res, 404, false, "Plan not found");
@@ -92,26 +104,23 @@ export const getPlanById = asyncHandler(async (req, res) => {
   return sendResponse(res, 200, true, "Plan retrieved successfully", plan);
 });
 
-/**
- * @desc    Update a plan
- * @route   PUT /api/plans/:id
- * @access  Private (Admin)
- */
-export const updatePlan = asyncHandler(async (req, res) => {
-  const { name } = req.body;
+// ─── UPDATE PLAN ─────────────────────────────────────────
 
-  // Check name uniqueness if being changed
-  if (name) {
+export const updatePlan = asyncHandler(async (req, res) => {
+  const { packageplan } = req.body;
+
+  if (packageplan) {
     const conflict = await Plan.findOne({
-      name: name.trim(),
+      packageplan: packageplan.trim(),
       _id: { $ne: req.params.id },
     });
+
     if (conflict) {
       return sendResponse(
         res,
         409,
         false,
-        `Another plan named "${name}" already exists`,
+        `Another plan "${packageplan}" already exists`,
       );
     }
   }
@@ -129,11 +138,8 @@ export const updatePlan = asyncHandler(async (req, res) => {
   return sendResponse(res, 200, true, "Plan updated successfully", updatedPlan);
 });
 
-/**
- * @desc    Soft-delete (deactivate) a plan
- * @route   DELETE /api/plans/:id
- * @access  Private (Admin)
- */
+// ─── DELETE (SOFT DELETE) ────────────────────────────────
+
 export const deletePlan = asyncHandler(async (req, res) => {
   const plan = await Plan.findByIdAndUpdate(
     req.params.id,
@@ -148,11 +154,8 @@ export const deletePlan = asyncHandler(async (req, res) => {
   return sendResponse(res, 200, true, "Plan deactivated successfully", plan);
 });
 
-/**
- * @desc    Restore (reactivate) a deactivated plan
- * @route   PATCH /api/plans/:id/restore
- * @access  Private (Admin)
- */
+// ─── RESTORE PLAN ────────────────────────────────────────
+
 export const restorePlan = asyncHandler(async (req, res) => {
   const plan = await Plan.findByIdAndUpdate(
     req.params.id,

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import UserSchema from "../models/user.js";
+import User from "../models/user.js";
 
 //Helpers
 
@@ -33,7 +33,7 @@ export const protect = async (req, res, next) => {
     }
 
     // Fetch fresh user from DB (ensures deactivated accounts are blocked)
-    const user = await UserSchema.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
       return sendUnauthorized(res, "User no longer exists.");

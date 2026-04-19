@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createPlan,
   getAllPlans,
-  getPlanById,
+  getPlanByPackagePlan,
   updatePlan,
   deletePlan,
   restorePlan,
@@ -13,13 +13,13 @@ import { protect, adminOnly } from "../middleware/auth.js";
 const router = Router();
 
 //Public Routes
-router.get("/", getAllPlans);
-router.get("/:id", getPlanById);
+router.get("/", getAllPlans); //tested
+router.get("/:packageplan", getPlanByPackagePlan); // tested
 
 //  Admin-Protected Routes
-router.post("/", protect, adminOnly, createPlan);
-router.put("/:id", protect, adminOnly, updatePlan);
-router.delete("/:id", protect, adminOnly, deletePlan);
-router.patch("/:id/restore", protect, adminOnly, restorePlan);
+router.post("/", protect, adminOnly, createPlan); // tested
+router.put("/:id", protect, adminOnly, updatePlan); //tested
+router.delete("/:id", protect, adminOnly, deletePlan); //tested
+router.patch("/:id/restore", protect, adminOnly, restorePlan); //tested
 
 export default router;

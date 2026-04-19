@@ -28,7 +28,7 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcryptjs.hash(password, 10);
 
     const verificationToken = Math.floor(
-      100000 + Math.random() * 900000
+      100000 + Math.random() * 900000,
     ).toString();
 
     const newuser = new User({
@@ -69,7 +69,7 @@ export const verifyEmail = async (req, res) => {
     console.log("Incoming code:", code);
     console.log(
       "User in DB with that code:",
-      await User.findOne({ verificationToken: code })
+      await User.findOne({ verificationToken: code }),
     );
 
     if (!user) {
@@ -115,13 +115,14 @@ export const login = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid Credendtials" });
     }
-    generateTokenAndSetCookie(res, user._id);
+    const token = generateTokenAndSetCookie(res, user._id);
 
     user.lastLogin = new Date();
     await user.save();
     res.status(200).json({
       success: true,
       message: "Logged in successfully",
+      token,
       user: {
         ...user._doc,
         password: undefined,
@@ -156,7 +157,7 @@ export const forgotPassword = async (req, res) => {
     // send email
     await sendPasswordRestEmail(
       user.email,
-      `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}`,
     );
     res.status(200).json({
       success: true,
