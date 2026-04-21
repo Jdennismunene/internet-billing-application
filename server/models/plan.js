@@ -50,4 +50,7 @@ const planSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model("Plan", planSchema);
+// 🔥 FIX: prevent OverwriteModelError in nodemon + ESM
+const Plan = mongoose.models.Plan || mongoose.model("Plan", planSchema);
+
+export default Plan;

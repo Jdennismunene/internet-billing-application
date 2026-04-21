@@ -18,8 +18,8 @@ router.post("/upload", streamUpload);
 
 // Test lifecycle
 router.post("/start", startTest); //tested
-router.post("/submit/:id", submitResults);
-router.get("/status/:id", getTestStatus);
-router.get("/stream/:id", streamTestProgress);
+router.post("/submit/:id", submitResults); //tested
+router.get("/status/:id", getTestStatus); //tested
+router.get("/stream/:id", streamTestProgress); //tested
 
 export default router;

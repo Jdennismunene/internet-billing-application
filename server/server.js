@@ -12,6 +12,8 @@ import setupPingSocket from "./ws/pingSocket.js";
 import planRoutes from "./routes/plan.routes.js";
 import billingRoutes from "./routes/biling.routes.js";
 import speedTestRoutes from "./routes/speedTest.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
+import reportRoutes from "./routes/report.routes.js";
 dotenv.config();
 await connectDB();
 
@@ -26,12 +28,15 @@ app.use(cookieParser());
 app.use(express.raw({ type: "application/octet-stream", limit: "100mb" }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/plans", planRoutes);
 app.use("/api/billing", billingRoutes);
 app.use("/api/speedtest", speedTestRoutes);
+app.use("/api/admin/reports", reportRoutes);
+app.use("/api/admin/notifications", notificationRoutes);
 
 // WebSocket
 setupPingSocket(server);

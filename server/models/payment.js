@@ -1,48 +1,28 @@
 import mongoose from "mongoose";
 
-const PaymentSchema = new mongoose.Schema({
-  bill: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Billing",
-    required: true,
+const paymentSchema = new mongoose.Schema(
+  {
+    paymentCode: { type: String, required: true, unique: true, trim: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    paymentMethod: {
+      type: String,
+      enum: ["mpesa", "bank", "card", "cash", "other"],
+      default: "other",
+    },
+    name: { type: String, required: true },
+    amount: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: ["pending", "completed", "failed", "refunded"],
+      default: "pending",
+    },
+    package: { type: mongoose.Schema.Types.ObjectId, ref: "Package" },
+    transactionRef: { type: String },
+    paidAt: { type: Date },
   },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  plan: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Plan",
-    required: true,
-  },
-  amountPaid: {
-    type: Number,
-    required: true,
-  },
-  totalRevenue: {
-    type: Number,
-    required: true,
-  },
-  paymentMethod: {
-    type: String,
-    enum: ["mpesa", "card", "cash"],
-    required: true,
-  },
-  transactionId: {
-    type: String,
-    unique: true,
-  },
-  status: {
-    type: String,
-    enum: ["success", "failed", "pending"],
-    default: "success",
-  },
-  paidAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true },
+);
 
-const Payment = mongoose.model("Payment", PaymentSchema);
+const Payment = mongoose.model("Payment", paymentSchema);
+
 export default Payment;

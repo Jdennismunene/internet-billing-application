@@ -24,24 +24,28 @@ export const startTest = async (req, res) => {
 
 // CLIENT SENDS REAL RESULTS
 export const submitResults = async (req, res) => {
-  const { download, upload, ping, jitter } = req.body;
+  try {
+    const { download = 0, upload = 0, ping = 0, jitter = 0 } = req.body || {};
 
-  const test = await SpeedTest.findByIdAndUpdate(
-    req.params.id,
-    {
-      download,
-      upload,
-      ping,
-      jitter,
-      status: "completed",
-      progress: 100,
-    },
-    { new: true },
-  );
+    const test = await SpeedTest.findByIdAndUpdate(
+      req.params.id,
+      {
+        downloadSpeed: download,
+        uploadSpeed: upload,
+        ping,
+        jitter,
+        status: "completed",
+        progress: 100,
+      },
+      { new: true },
+    );
 
-  res.json(test);
+    res.json(test);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to submit results" });
+  }
 };
-
 // STATUS
 export const getTestStatus = async (req, res) => {
   const test = await SpeedTest.findById(req.params.id);
