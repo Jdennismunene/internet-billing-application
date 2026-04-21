@@ -1,92 +1,103 @@
-import { MailtrapClient } from "mailtrap";
-
-import { client, sender } from "./mailtrap.config.js";
+import { transporter, sender } from "./nodemailer.config.js";
 import {
   VERIFICATION_EMAIL_TEMPLATE,
   PASSWORD_RESET_REQUEST_TEMPLATE,
   PASSWORD_RESET_SUCCESS_TEMPLATE,
 } from "./emailtemplete.js";
-// import { app } from "../server.js";
 
+// ✅ Send Verification Email
 export const sendVerificationEmail = async (email, verificationToken) => {
   if (!email) {
     throw new Error("Recipient email is missing!");
   }
 
-  const recipient = [{ email }];
-
   try {
-    const response = await client.send({
-      from: sender,
-      to: recipient,
+    const response = await transporter.sendMail({
+      from: `"${sender.name}" <${sender.email}>`,
+      to: email,
       subject: "Verify Your Email",
       html: VERIFICATION_EMAIL_TEMPLATE.replace(
         "{verificationCode}",
-        verificationToken
+        verificationToken,
       ),
-      category: "Email Verification",
     });
 
-    console.log("Email Sent Successfully", response);
+    console.log("Verification email sent successfully:", response);
     return response;
   } catch (error) {
-    console.error(" Error sending verification email:", error.message);
+    console.error("Error sending verification email:", error.message);
     throw new Error(`Error sending verification email: ${error.message}`);
   }
 };
 
+// ✅ Send Welcome Email
 export const sendWelcomeEmail = async (email, name) => {
+  if (!email) {
+    throw new Error("Recipient email is missing!");
+  }
+
   try {
-    // Capture the response from Mailtrap
-    const response = await client.send({
-      from: sender,
-      to: [{ email }],
-      template_uuid: "91a28711-d52b-4bc2-a18b-a513bcf28405".trim(),
-      template_variables: {
-        company_info_name: "Internet Billing System",
-        name: name,
-      },
+    const response = await transporter.sendMail({
+      from: `"${sender.name}" <${sender.email}>`,
+      to: email,
+      subject: "Welcome 🎉",
+      html: `
+        <h1>Welcome ${name} 🎉</h1>
+        <p>We're glad to have you at <strong>Internet Billing System</strong>.</p>
+        <p>Your account has been successfully created.</p>
+      `,
     });
 
-    console.log("Welcome email sent successfully", response);
+    console.log("Welcome email sent successfully:", response);
     return response;
   } catch (error) {
-    console.error("Error sending welcome email", error);
+    console.error("Error sending welcome email:", error.message);
     throw new Error(`Error sending welcome email: ${error.message}`);
   }
 };
 
-export const sendPasswordRestEmail = async (email, restURL) => {
-  const recipient = [{ email }];
+// ✅ Send Password Reset Email
+export const sendPasswordRestEmail = async (email, resetURL) => {
+  if (!email) {
+    throw new Error("Recipient email is missing!");
+  }
+
   try {
-    const response = await client.send({
-      from: sender,
-      to: [{ email }],
-      subject: "Reset your passwpord",
-      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL", restURL),
-      category: "Password Reset",
+    const response = await transporter.sendMail({
+      from: `"${sender.name}" <${sender.email}>`,
+      to: email,
+      subject: "Reset Your Password",
+      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", resetURL),
     });
+
+    console.log("Password reset email sent:", response);
+    return response;
   } catch (error) {
-    console.error(`Error sending password reset email`, error);
-    throw new Error(`Error sending password reset email:${error}`);
+    console.error("Error sending password reset email:", error.message);
+    throw new Error(`Error sending password reset email: ${error.message}`);
   }
 };
+
+// ✅ Send Reset Success Email
 export const sendResetSuccessEmail = async (email) => {
+  if (!email) {
+    throw new Error("Recipient email is missing!");
+  }
+
   try {
-    const response = await client.send({
-      from: sender,
-      to: [{ email }],
+    const response = await transporter.sendMail({
+      from: `"${sender.name}" <${sender.email}>`,
+      to: email,
       subject: "Password Reset Successful",
       html: PASSWORD_RESET_SUCCESS_TEMPLATE,
-      category: "password Reset",
     });
 
-    console.log("Password reset email sent successfully", response);
+    console.log("Password reset success email sent:", response);
+    return response;
   } catch (error) {
-    console.error(`Error sending password reset success email`, error);
-
+    console.error("Error sending password reset success email:", error.message);
     throw new Error(
-      `Error sending password reset success email: ${error.message}`
+      `Error sending password reset success email: ${error.message}`,
     );
   }
 };

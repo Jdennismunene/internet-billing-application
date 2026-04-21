@@ -1,6 +1,28 @@
 import User from "../models/user.js";
 import Billing from "../models/billing.js";
 import SpeedTest from "../models/speedTest.js";
+
+// Getting all users
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users: users.map((user) => {
+        const { password, ...userData } = user._doc;
+        return userData; // remove password for security
+      }),
+    });
+  } catch (error) {
+    console.log("Error in getAllUsers", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 // get profile
 export const getProfile = async (req, res) => {
   try {

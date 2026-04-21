@@ -4,10 +4,12 @@ import {
   updateProfile,
   getUserBilling,
   getUserSpeedTests,
+  getAllUsers,
 } from "../controllers/user.controller.js";
 import { verifyToken } from "../middleware/verifytoken.js";
 
 const router = express.Router();
+router.get("/getallusers", getAllUsers);
 // get profile
 router.get("/profile", verifyToken, getProfile);
 // update profile
